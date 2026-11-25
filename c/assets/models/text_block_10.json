@@ -1,0 +1,82 @@
+{
+  "id": 8,
+  "name": "text_block_10",
+  "mesh": "text_block_10.ply",
+  "visibility": "single_pass",
+  "reference_polar": [
+    [
+      3,
+      240,
+      136
+    ],
+    [
+      32,
+      240,
+      192
+    ],
+    [
+      96,
+      240,
+      192
+    ],
+    [
+      125,
+      240,
+      136
+    ],
+    [
+      3,
+      112,
+      136
+    ],
+    [
+      32,
+      112,
+      192
+    ],
+    [
+      96,
+      112,
+      192
+    ],
+    [
+      125,
+      112,
+      136
+    ]
+  ],
+  "faces": [
+    {
+      "loop": "model_vertex_loop_552a",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_552f",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5534",
+      "palette_pair": [
+        2,
+        2
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5539",
+      "palette_pair": [
+        3,
+        3
+      ],
+      "back_pass": false
+    }
+  ]
+}

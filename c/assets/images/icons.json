@@ -1,0 +1,249 @@
+{
+  "tile_width": 8,
+  "tile_height": 8,
+  "tiles": [
+    {
+      "name": "blank",
+      "description": "blank/spacer"
+    },
+    {
+      "name": "robot",
+      "description": "robot energy icon: 3 energy"
+    },
+    {
+      "name": "tree_left",
+      "description": "tree energy icon: 1 energy, left half"
+    },
+    {
+      "name": "tree_right",
+      "description": "tree energy icon: 1 energy, right half"
+    },
+    {
+      "name": "boulder_left",
+      "description": "boulder energy icon: 2 energy, left half"
+    },
+    {
+      "name": "boulder_right",
+      "description": "boulder energy icon: 2 energy, right half"
+    },
+    {
+      "name": "golden_robot",
+      "description": "golden robot energy icon: 15 energy; a HUD denomination, not a separate creatable model"
+    },
+    {
+      "name": "frame_left",
+      "description": "left end of the outlined status field"
+    },
+    {
+      "name": "frame_middle",
+      "description": "top and bottom edges of the status field"
+    },
+    {
+      "name": "frame_right",
+      "description": "right end of the outlined status field"
+    }
+  ],
+  "banks": [
+    {
+      "file": "cga.png",
+      "layout": "cga",
+      "symbol": "status_tiles_cga",
+      "palette": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          170,
+          170
+        ],
+        [
+          170,
+          0,
+          170
+        ],
+        [
+          255,
+          255,
+          255
+        ]
+      ]
+    },
+    {
+      "file": "color.png",
+      "layout": "packed",
+      "symbol": "status_tiles_packed",
+      "palette": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          170
+        ],
+        [
+          0,
+          170,
+          0
+        ],
+        [
+          0,
+          170,
+          170
+        ],
+        [
+          170,
+          0,
+          0
+        ],
+        [
+          170,
+          0,
+          170
+        ],
+        [
+          170,
+          85,
+          0
+        ],
+        [
+          170,
+          170,
+          170
+        ],
+        [
+          85,
+          85,
+          85
+        ],
+        [
+          85,
+          85,
+          255
+        ],
+        [
+          85,
+          255,
+          85
+        ],
+        [
+          85,
+          255,
+          255
+        ],
+        [
+          255,
+          85,
+          85
+        ],
+        [
+          255,
+          85,
+          255
+        ],
+        [
+          255,
+          255,
+          85
+        ],
+        [
+          255,
+          255,
+          255
+        ]
+      ]
+    },
+    {
+      "file": "color.png",
+      "layout": "ega",
+      "symbol": "status_tiles_ega",
+      "palette": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          170
+        ],
+        [
+          0,
+          170,
+          0
+        ],
+        [
+          0,
+          170,
+          170
+        ],
+        [
+          170,
+          0,
+          0
+        ],
+        [
+          170,
+          0,
+          170
+        ],
+        [
+          170,
+          85,
+          0
+        ],
+        [
+          170,
+          170,
+          170
+        ],
+        [
+          85,
+          85,
+          85
+        ],
+        [
+          85,
+          85,
+          255
+        ],
+        [
+          85,
+          255,
+          85
+        ],
+        [
+          85,
+          255,
+          255
+        ],
+        [
+          255,
+          85,
+          85
+        ],
+        [
+          255,
+          85,
+          255
+        ],
+        [
+          255,
+          255,
+          85
+        ],
+        [
+          255,
+          255,
+          255
+        ]
+      ]
+    }
+  ]
+}

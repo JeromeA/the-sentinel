@@ -1,0 +1,215 @@
+{
+  "id": 2,
+  "name": "tree",
+  "mesh": "tree.ply",
+  "visibility": "single_pass",
+  "reference_polar": [
+    [
+      224,
+      240,
+      24
+    ],
+    [
+      32,
+      240,
+      24
+    ],
+    [
+      96,
+      240,
+      24
+    ],
+    [
+      160,
+      240,
+      24
+    ],
+    [
+      224,
+      200,
+      24
+    ],
+    [
+      32,
+      200,
+      24
+    ],
+    [
+      96,
+      200,
+      24
+    ],
+    [
+      160,
+      200,
+      24
+    ],
+    [
+      0,
+      200,
+      104
+    ],
+    [
+      32,
+      200,
+      104
+    ],
+    [
+      64,
+      200,
+      104
+    ],
+    [
+      96,
+      200,
+      104
+    ],
+    [
+      128,
+      200,
+      104
+    ],
+    [
+      160,
+      200,
+      104
+    ],
+    [
+      192,
+      200,
+      104
+    ],
+    [
+      224,
+      200,
+      104
+    ],
+    [
+      0,
+      120,
+      0
+    ]
+  ],
+  "faces": [
+    {
+      "loop": "tree_face_00_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_01_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_02_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_03_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_04_vertices",
+      "palette_pair": [
+        13,
+        13
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_05_vertices",
+      "palette_pair": [
+        13,
+        13
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_06_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_07_vertices",
+      "palette_pair": [
+        4,
+        4
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_08_vertices",
+      "palette_pair": [
+        5,
+        5
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "tree_face_09_vertices",
+      "palette_pair": [
+        4,
+        4
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_54b9",
+      "palette_pair": [
+        5,
+        5
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_54bd",
+      "palette_pair": [
+        4,
+        4
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_54c1",
+      "palette_pair": [
+        5,
+        5
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_54c5",
+      "palette_pair": [
+        4,
+        4
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_54c9",
+      "palette_pair": [
+        5,
+        5
+      ],
+      "back_pass": false
+    }
+  ]
+}

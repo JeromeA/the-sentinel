@@ -1,0 +1,41 @@
+#ifndef SENTINEL_TEXT_BYTECODE_H
+#define SENTINEL_TEXT_BYTECODE_H
+
+/* Game-screen text protocol; DOS console controls and terrain lettering have
+ * separate interpreters. NEXT_GLYPH advances two column units, not a tab stop. */
+enum TextBytecode {
+    TEXT_NORMAL_STYLE = 0x04,
+    TEXT_ALTERNATE_STYLE = 0x05,
+    TEXT_PREVIOUS_GLYPH = 0x08,
+    TEXT_NEXT_GLYPH = 0x09,
+    TEXT_NEWLINE = 0x0a,
+    TEXT_CARRIAGE_RETURN = 0x0d,
+    TEXT_SET_NORMAL_BACKGROUND = 0x11,
+    TEXT_SET_ALTERNATE_COLOR = 0x12,
+    TEXT_SET_GLYPH_FLAGS = 0x19,
+    TEXT_SET_POSITION = 0x1f,
+    TEXT_SPACE = 0x20,
+    TEXT_FIRST_GLYPH = 0x20,
+    TEXT_ERASE_GLYPH = 0x7f,
+    TEXT_GLYPH_LIMIT = 0x60,
+    TEXT_FONT_GLYPHS = 64,
+    TEXT_SCRIPT_CALL_BASE = 200,
+    TEXT_SCRIPT_END = 255
+};
+
+enum TextParameters {
+    TEXT_GLYPH_FLAGS_IGNORED_PARAMETERS = 4,
+    TEXT_GLYPH_FLAGS_PARAMETERS = TEXT_GLYPH_FLAGS_IGNORED_PARAMETERS + 1,
+    TEXT_INLINE_PACKET_BYTES = 1 + TEXT_GLYPH_FLAGS_PARAMETERS,
+    TEXT_POSITION_PARAMETERS = 2,
+    TEXT_ALTERNATE_COLOR_IGNORED_PARAMETERS = 1,
+    TEXT_ALTERNATE_COLOR_PARAMETERS = TEXT_ALTERNATE_COLOR_IGNORED_PARAMETERS + 1,
+    TEXT_NORMAL_BACKGROUND_PARAMETERS = 1
+};
+
+/* The final alternate-color parameter selects foreground or background. */
+enum TextColorSelector {
+    TEXT_COLOR_BACKGROUND = 0x80,
+    TEXT_COLOR_INDEX_MASK = 0x7f
+};
+#endif

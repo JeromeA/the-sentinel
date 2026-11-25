@@ -1,0 +1,22 @@
+#!/bin/sh
+# Invoke a project-local IA-16 tool without changing the calling shell.
+set -eu
+ia16_project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+ia16_bin="$ia16_project_dir/tools/vendor/ia16/root/usr/bin"
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $0 gcc|as|ld|objdump|objcopy|... [arguments...]" >&2
+    exit 2
+fi
+ia16_tool=$1
+shift
+case "$ia16_tool" in
+    *[!a-zA-Z0-9_-]*|'') echo "Invalid IA-16 tool name" >&2; exit 2 ;;
+esac
+if [ ! -x "$ia16_bin/ia16-elf-$ia16_tool" ]; then
+    echo "Missing IA-16 tool; run python3 tools/install_ia16.py" >&2
+    exit 1
+fi
+PATH="$ia16_bin:$PATH"
+LD_LIBRARY_PATH="$ia16_bin/../x86_64-linux-gnu/ia16-elf/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export PATH LD_LIBRARY_PATH
+exec "$ia16_bin/ia16-elf-$ia16_tool" "$@"

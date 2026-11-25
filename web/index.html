@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>The Sentinel Remaster</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="vendor/three.min.js"></script>
+    <script defer src="src/asset-data.js"></script>
+    <script defer src="src/assets.js"></script>
+    <script defer src="src/world.js"></script>
+    <script defer src="src/game.js"></script>
+    <script defer src="src/audio.js"></script>
+    <script defer src="src/render.js"></script>
+    <script defer src="src/known-levels.js"></script>
+    <script defer src="src/app.js"></script>
+</head>
+<body>
+    <main>
+        <nav id="known-levels" aria-label="Known landscapes">
+            <h2>Level</h2>
+            <div id="known-level-list"></div>
+            <button id="reset-levels" type="button" title="Clear known levels, keeping 0000" aria-label="Reset known landscapes to 0000">Reset</button>
+        </nav>
+        <section id="viewport" aria-label="Game">
+        <canvas id="game" tabindex="0" aria-label="The Sentinel Remaster. Mouse look; left click absorbs, right click transfers; T, B, R create; H hyperspaces. Escape pauses."></canvas>
+        <p id="status" role="status">Loading The Sentinel Remaster…</p>
+        </section>
+    </main>
+    <noscript>This game requires JavaScript and WebGL 2.</noscript>
+</body>
+</html>

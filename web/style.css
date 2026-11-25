@@ -1,0 +1,26 @@
+:root { color-scheme: dark; font-family: monospace; background: #030309; color: #ddd; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+main { width: 100%; height: 100%; display: grid; grid-template-columns: calc(5ch + 1.25rem + 20px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+#viewport { min-width: 0; min-height: 0; height: 100%; display: grid; place-items: center; position: relative; }
+#known-levels { height: 100%; min-height: 0; display: flex; flex-direction: column; background: #080d15; border-right: 1px solid #29404a; padding: .25rem; }
+#known-levels h2 { flex-shrink: 0; margin: 0; padding: .4rem 0; color: #8cdddd; font: inherit; text-align: center; }
+#known-level-list { flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; scrollbar-color: transparent transparent; }
+#known-levels:hover #known-level-list, #known-levels:focus-within #known-level-list { scrollbar-color: #52616b transparent; }
+#known-level-list::-webkit-scrollbar { width: 12px; }
+#known-level-list::-webkit-scrollbar-track, #known-level-list::-webkit-scrollbar-thumb { background: transparent; }
+#known-level-list::-webkit-scrollbar-button { display: none; }
+#known-levels:hover #known-level-list::-webkit-scrollbar-thumb, #known-levels:focus-within #known-level-list::-webkit-scrollbar-thumb { background: #52616b; }
+#known-levels #reset-levels { flex-shrink: 0; margin-top: .25rem; border-top-color: #29404a; }
+#known-levels button { display: block; width: 100%; padding: .4rem 0; border: 1px solid transparent; background: transparent; color: #8cdddd; font: inherit; cursor: pointer; }
+#known-level-list button { display: flex; align-items: center; justify-content: center; gap: .25rem; }
+.level-result { display: inline-block; width: 1ch; flex-shrink: 0; }
+#known-level-list button[data-result="won"] .level-result { color: #6edb93; }
+#known-level-list button[data-result="lost"] .level-result { color: #ef8888; }
+#known-levels button:hover:not(:disabled), #known-levels button:focus-visible { background: #142b35; border-color: #5aa; outline: none; }
+#known-levels button[aria-current="true"] { background: #164453; color: #fff; }
+#known-levels button:disabled { color: #68757a; cursor: default; }
+canvas { display: block; outline: none; image-rendering: pixelated; touch-action: none; }
+#status { position: absolute; max-width: 36rem; padding: 2rem; background: #000; border: 1px solid #5aa; }
+[hidden] { display: none !important; }
+noscript { position: absolute; top: 20%; left: 10%; }

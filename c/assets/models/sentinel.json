@@ -1,0 +1,440 @@
+{
+  "id": 5,
+  "name": "sentinel",
+  "mesh": "sentinel.ply",
+  "visibility": "height_ordered",
+  "reference_polar": [
+    [
+      218,
+      240,
+      56
+    ],
+    [
+      38,
+      240,
+      56
+    ],
+    [
+      90,
+      240,
+      56
+    ],
+    [
+      166,
+      240,
+      56
+    ],
+    [
+      218,
+      224,
+      42
+    ],
+    [
+      38,
+      224,
+      42
+    ],
+    [
+      90,
+      224,
+      42
+    ],
+    [
+      166,
+      224,
+      42
+    ],
+    [
+      245,
+      136,
+      50
+    ],
+    [
+      11,
+      136,
+      50
+    ],
+    [
+      64,
+      139,
+      54
+    ],
+    [
+      90,
+      139,
+      42
+    ],
+    [
+      166,
+      139,
+      42
+    ],
+    [
+      192,
+      139,
+      54
+    ],
+    [
+      218,
+      8,
+      34
+    ],
+    [
+      38,
+      8,
+      34
+    ],
+    [
+      90,
+      5,
+      34
+    ],
+    [
+      166,
+      5,
+      34
+    ],
+    [
+      245,
+      8,
+      64
+    ],
+    [
+      11,
+      8,
+      64
+    ],
+    [
+      83,
+      2,
+      70
+    ],
+    [
+      173,
+      2,
+      70
+    ],
+    [
+      248,
+      17,
+      63
+    ],
+    [
+      8,
+      17,
+      63
+    ],
+    [
+      226,
+      24,
+      34
+    ],
+    [
+      30,
+      24,
+      34
+    ],
+    [
+      220,
+      39,
+      19
+    ],
+    [
+      36,
+      39,
+      19
+    ],
+    [
+      102,
+      39,
+      24
+    ],
+    [
+      154,
+      39,
+      24
+    ]
+  ],
+  "faces": [
+    {
+      "loop": "sentinel_face_00_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "sentinel_face_01_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "sentinel_face_02_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "sentinel_face_03_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "sentinel_face_04_vertices",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "sentinel_face_05_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "sentinel_face_06_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "sentinel_face_07_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "sentinel_face_08_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "sentinel_face_09_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5379",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_537d",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5382",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5386",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_538a",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_538e",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5392",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5396",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_539a",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_539f",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_53a3",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_53a7",
+      "palette_pair": [
+        3,
+        3
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_53ab",
+      "palette_pair": [
+        3,
+        3
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_53af",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_53b4",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53b9",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53be",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53c2",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53c6",
+      "palette_pair": [
+        0,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53cb",
+      "palette_pair": [
+        0,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53d0",
+      "palette_pair": [
+        0,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53d5",
+      "palette_pair": [
+        0,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53da",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53df",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_53e4",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": false
+    }
+  ]
+}

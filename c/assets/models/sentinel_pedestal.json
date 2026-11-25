@@ -1,0 +1,158 @@
+{
+  "id": 6,
+  "name": "sentinel_pedestal",
+  "mesh": "sentinel_pedestal.ply",
+  "visibility": "single_pass",
+  "reference_polar": [
+    [
+      224,
+      240,
+      181
+    ],
+    [
+      32,
+      240,
+      181
+    ],
+    [
+      96,
+      240,
+      181
+    ],
+    [
+      160,
+      240,
+      181
+    ],
+    [
+      212,
+      16,
+      145
+    ],
+    [
+      236,
+      16,
+      145
+    ],
+    [
+      20,
+      16,
+      145
+    ],
+    [
+      44,
+      16,
+      145
+    ],
+    [
+      84,
+      16,
+      145
+    ],
+    [
+      108,
+      16,
+      145
+    ],
+    [
+      148,
+      16,
+      145
+    ],
+    [
+      172,
+      16,
+      145
+    ]
+  ],
+  "faces": [
+    {
+      "loop": "model_vertex_loop_54f7",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_54fc",
+      "palette_pair": [
+        2,
+        2
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5501",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5506",
+      "palette_pair": [
+        2,
+        2
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_550b",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_550f",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5513",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5517",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_551b",
+      "palette_pair": [
+        3,
+        3
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5520",
+      "palette_pair": [
+        3,
+        3
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5525",
+      "palette_pair": [
+        3,
+        3
+      ],
+      "back_pass": false
+    }
+  ]
+}

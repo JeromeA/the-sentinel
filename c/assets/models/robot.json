@@ -1,0 +1,371 @@
+{
+  "id": 0,
+  "name": "robot",
+  "mesh": "robot.ply",
+  "visibility": "height_ordered",
+  "reference_polar": [
+    [
+      207,
+      240,
+      20
+    ],
+    [
+      49,
+      240,
+      20
+    ],
+    [
+      95,
+      240,
+      27
+    ],
+    [
+      161,
+      240,
+      27
+    ],
+    [
+      217,
+      184,
+      31
+    ],
+    [
+      39,
+      184,
+      31
+    ],
+    [
+      87,
+      184,
+      35
+    ],
+    [
+      169,
+      184,
+      35
+    ],
+    [
+      203,
+      184,
+      42
+    ],
+    [
+      0,
+      184,
+      32
+    ],
+    [
+      53,
+      184,
+      42
+    ],
+    [
+      85,
+      184,
+      48
+    ],
+    [
+      171,
+      184,
+      48
+    ],
+    [
+      197,
+      146,
+      52
+    ],
+    [
+      59,
+      146,
+      52
+    ],
+    [
+      82,
+      146,
+      56
+    ],
+    [
+      174,
+      146,
+      56
+    ],
+    [
+      0,
+      138,
+      0
+    ],
+    [
+      236,
+      139,
+      19
+    ],
+    [
+      20,
+      139,
+      19
+    ],
+    [
+      99,
+      139,
+      29
+    ],
+    [
+      157,
+      139,
+      29
+    ],
+    [
+      192,
+      8,
+      12
+    ],
+    [
+      64,
+      8,
+      12
+    ],
+    [
+      105,
+      8,
+      19
+    ],
+    [
+      151,
+      8,
+      19
+    ],
+    [
+      33,
+      131,
+      28
+    ],
+    [
+      223,
+      131,
+      28
+    ],
+    [
+      0,
+      149,
+      32
+    ]
+  ],
+  "faces": [
+    {
+      "loop": "robot_face_00_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "robot_face_01_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "robot_face_02_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "robot_face_03_vertices",
+      "palette_pair": [
+        0,
+        2
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "robot_face_04_vertices",
+      "palette_pair": [
+        0,
+        2
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "robot_face_05_vertices",
+      "palette_pair": [
+        2,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "robot_face_06_vertices",
+      "palette_pair": [
+        2,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "robot_face_07_vertices",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "robot_face_08_vertices",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "robot_face_09_vertices",
+      "palette_pair": [
+        12,
+        12
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_556f",
+      "palette_pair": [
+        0,
+        12
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5573",
+      "palette_pair": [
+        0,
+        12
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5577",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_557b",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_557f",
+      "palette_pair": [
+        0,
+        12
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5583",
+      "palette_pair": [
+        0,
+        12
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5587",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_558b",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_558f",
+      "palette_pair": [
+        0,
+        12
+      ],
+      "back_pass": true
+    },
+    {
+      "loop": "model_vertex_loop_5593",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_5598",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_559c",
+      "palette_pair": [
+        6,
+        6
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_55a0",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_55a5",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_55aa",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_55af",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "model_vertex_loop_55b4",
+      "palette_pair": [
+        9,
+        9
+      ],
+      "back_pass": false
+    }
+  ]
+}

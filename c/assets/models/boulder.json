@@ -1,0 +1,130 @@
+{
+  "id": 3,
+  "name": "boulder",
+  "mesh": "boulder.ply",
+  "visibility": "single_pass",
+  "reference_polar": [
+    [
+      0,
+      176,
+      112
+    ],
+    [
+      32,
+      240,
+      112
+    ],
+    [
+      64,
+      176,
+      112
+    ],
+    [
+      96,
+      240,
+      112
+    ],
+    [
+      128,
+      176,
+      112
+    ],
+    [
+      160,
+      240,
+      112
+    ],
+    [
+      192,
+      176,
+      112
+    ],
+    [
+      224,
+      240,
+      112
+    ]
+  ],
+  "faces": [
+    {
+      "loop": "boulder_face_00_vertices",
+      "palette_pair": [
+        15,
+        15
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_01_vertices",
+      "palette_pair": [
+        15,
+        15
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_02_vertices",
+      "palette_pair": [
+        15,
+        15
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_03_vertices",
+      "palette_pair": [
+        15,
+        15
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_04_vertices",
+      "palette_pair": [
+        11,
+        11
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_05_vertices",
+      "palette_pair": [
+        11,
+        11
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_06_vertices",
+      "palette_pair": [
+        11,
+        11
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_07_vertices",
+      "palette_pair": [
+        11,
+        11
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_08_vertices",
+      "palette_pair": [
+        0,
+        0
+      ],
+      "back_pass": false
+    },
+    {
+      "loop": "boulder_face_09_vertices",
+      "palette_pair": [
+        15,
+        15
+      ],
+      "back_pass": false
+    }
+  ]
+}
