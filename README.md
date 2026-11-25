@@ -1,5 +1,10 @@
 # The Sentinel
 
+**[Play The Sentinel Remaster](https://jeromea.github.io/the-sentinel/web/)** in your browser.
+
+Explore the landscapes, absorb energy, create robots and outwit the Sentinel.
+No installation is needed—just a desktop browser, mouse and keyboard.
+
 Three independent implementations:
 
 - `asm/`: annotated NASM reconstruction, including EXEPACK compression to rebuild the original DOS executable.
