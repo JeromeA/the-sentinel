@@ -1,5 +1,6 @@
 (function (S) {
     'use strict';
+    const EFFECT = S.SoundEffect, MELODY = S.SoundMelody;
     class Application {
         constructor(canvas, assets) {
             this.canvas = canvas; this.assets = assets; this.view = new S.View(canvas, assets);
@@ -17,7 +18,7 @@
                 const button = event.target.closest('button[data-level]');
                 if (!button || !this.canChooseKnownLevel()) return;
                 const number = Number(button.dataset.level);
-                if (!this.knownLevels.codes.has(number)) return;
+                if (!this.knownLevels.unlocked.has(number)) return;
                 this.sound.enable(); this.beginLandscape(number); this.canvas.focus();
             });
             canvas.addEventListener('pointerdown', e => this.pointer(e));
@@ -31,7 +32,7 @@
             });
             document.addEventListener('pointerlockchange', () => {
                 if (this.screen !== 'playing') return;
-                if (document.pointerLockElement === canvas) {
+                if (document.pointerLockElement === canvas && !document.hidden) {
                     this.paused = false; this.resetClock(); this.sound.enable();
                 } else this.pause();
             });
@@ -39,7 +40,11 @@
                 this.pause(); this.notify('CLICK THE GAME TO CAPTURE THE MOUSE');
             });
             window.addEventListener('blur', () => this.pause());
-            document.addEventListener('visibilitychange', () => { if (document.hidden) this.pause(); });
+            window.addEventListener('focus', () => this.resumeBackgroundAudio());
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) this.pause();
+                else this.resumeBackgroundAudio();
+            });
             // Publish the first frame before hiding the loading message. This
             // also makes a newly opened file useful before its first RAF callback.
             this.view.startTitleTurn(this.lastTime);
@@ -69,7 +74,7 @@
         }
         syncKnownLevels() {
             if (!this.levelList) return;
-            const active = this.knownLevels.codes.has(this.selectedLevel) ? this.selectedLevel : null;
+            const active = this.knownLevels.unlocked.has(this.selectedLevel) ? this.selectedLevel : null;
             const enabled = this.canChooseKnownLevel(), state = `${enabled}:${active}`;
             if (state === this.levelListState) return;
             this.levelListState = state;
@@ -87,8 +92,8 @@
                 else if (item.bottom > list.bottom) this.levelList.scrollTop += item.bottom - list.bottom;
             }
         }
-        rememberLevel(number, code) {
-            if (this.knownLevels?.remember(number,code)) this.renderKnownLevels();
+        unlockLevel(number) {
+            if (this.knownLevels?.unlock(number)) this.renderKnownLevels();
         }
         recordLevelResult(result) {
             if (this.knownLevels?.recordResult(this.game.number,result)) this.renderKnownLevels();
@@ -103,9 +108,14 @@
             } catch (_) { this.pause(); this.notify('MOUSE CAPTURE IS NOT AVAILABLE IN THIS BROWSER'); }
         }
         pause() {
+            this.sound.pause();
             if (!['playing','overview'].includes(this.screen)) return;
             if (!this.paused) this.pauseStarted = performance.now();
-            this.paused = true; this.resetClock(); this.sound.pause(); this.unlock();
+            this.paused = true; this.resetClock(); this.unlock();
+        }
+        resumeBackgroundAudio() {
+            if (!this.paused && this.screen !== 'overview' && !document.hidden && this.sound.context)
+                this.sound.enable();
         }
         title() {
             this.screen = 'welcome'; this.paused = false; this.unlock(); this.sound.silence(); this.introMusic = false;
@@ -115,7 +125,7 @@
         beginLandscape(number) {
             this.selectedLevel = number;
             this.game = new S.Game(number);
-            this.rememberLevel(number,this.game.landscape.code);
+            this.unlockLevel(number);
             this.view.setGame(this.game); this.screen = 'preview'; this.paused = false;
             this.unlock(); if (!this.introMusic) this.sound.silence(); this.message = ''; this.resetClock();
             this.syncKnownLevels();
@@ -126,8 +136,8 @@
         }
         primary() {
             if (this.screen === 'welcome') {
-                this.sound.enable(); this.sound.melody(0); this.introMusic = true;
-                this.beginLandscape(this.knownLevels.codes.has(this.selectedLevel)
+                this.sound.enable(); this.sound.melody(MELODY.INTRO); this.introMusic = true;
+                this.beginLandscape(this.knownLevels.unlocked.has(this.selectedLevel)
                     ? this.selectedLevel : this.knownLevels.numbers().at(-1));
             } else if (this.screen === 'preview') this.enterGame();
             else if (this.screen === 'lost') this.beginLandscape(this.game.number);
@@ -147,7 +157,7 @@
             const key = event.key, lower = key.toLowerCase();
             const selecting = this.canChooseKnownLevel() && (key === 'ArrowUp' || key === 'ArrowDown');
             if (event.repeat && !selecting) return;
-            if (['Tab',' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Escape','Enter'].includes(key)) event.preventDefault();
+            if ([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Escape','Enter'].includes(key)) event.preventDefault();
             if (selecting) {
                 const levels = this.knownLevels.numbers(), index = levels.indexOf(this.selectedLevel);
                 const next = Math.max(0,Math.min(levels.length-1,index+(key === 'ArrowUp' ? -1 : 1)));
@@ -167,6 +177,7 @@
                 }
                 if (key === 'Escape') { this.pause(); return; }
                 if (key === 'Tab') {
+                    event.preventDefault();
                     if (this.screen === 'playing') { this.screen = 'overview'; this.unlock(); this.sound.pause(); this.resetClock(); }
                     else { this.screen = 'playing'; this.sound.enable(); this.capture(); }
                     return;
@@ -187,29 +198,29 @@
         }
         processEvents() {
             for (const event of this.game.takeEvents()) {
-                if (event.type === 'error') { this.notify(event.message); this.sound.effect(5,0xaa); }
+                if (event.type === 'error') { this.notify(event.message); this.sound.effect(EFFECT.ENERGY_FEEDBACK,0xaa); }
                 if (event.type === 'message') this.notify(event.message, 6500);
                 if (event.type === 'absorb' || event.type === 'create') {
-                    this.sound.effect(2);
+                    this.sound.effect(EFFECT.ACTION_SUCCESS);
                 }
-                if (event.type === 'transfer' || event.type === 'hyperspace') this.sound.melody(25);
-                if (event.type === 'drain') this.sound.effect(5);
-                if (event.type === 'meanie') { this.notify('A TREE HAS BECOME A MEANIE'); this.sound.effect(4); }
-                if (event.type === 'meanieTurn') this.sound.effect(1);
-                if (event.type === 'sentryTurn') this.sound.effect(0);
+                if (event.type === 'transfer' || event.type === 'hyperspace') this.sound.melody(MELODY.TRANSFER);
+                if (event.type === 'drain') this.sound.effect(EFFECT.ENERGY_FEEDBACK);
+                if (event.type === 'meanie') { this.notify('A TREE HAS BECOME A MEANIE'); this.sound.effect(EFFECT.WARNING_PULSE); }
+                if (event.type === 'meanieTurn') this.sound.effect(EFFECT.MEANIE_ROTATION);
+                if (event.type === 'sentryTurn') this.sound.effect(EFFECT.SENTRY_ROTATION);
                 if (event.type === 'forcedHyperspace') this.notify('THE MEANIE FORCES YOU INTO HYPERSPACE');
                 if (event.type === 'loss') {
                     this.recordLevelResult('lost');
                     this.screen = 'lost'; this.paused = false; this.unlock(); this.introMusic = false;
                     this.lossStarted = performance.now();
-                    this.sound.silence(); this.sound.melody(50); this.message = '';
+                    this.sound.silence(); this.sound.melody(MELODY.LOSS); this.message = '';
                 }
                 if (event.type === 'win') {
                     this.recordLevelResult('won');
-                    this.rememberLevel(event.number,event.code);
+                    this.unlockLevel(event.number);
                     this.introMusic = false;
                     this.beginLandscape(event.number);
-                    this.sound.melody(66);
+                    this.sound.melody(MELODY.VICTORY);
                 }
             }
         }

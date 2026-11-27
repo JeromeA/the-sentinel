@@ -3,7 +3,43 @@ window.Sentinel = window.Sentinel || {};
     'use strict';
     const MODEL = Object.freeze({ROBOT: 0, SENTRY: 1, TREE: 2, BOULDER: 3,
         MEANIE: 4, SENTINEL: 5, PEDESTAL: 6});
-    const ENERGY = [3, 3, 1, 2, 1, 4, 0];
+    const MODEL_INFO = Object.freeze({
+        [MODEL.ROBOT]: {energy: 3, sightTop: 0.12, label: 'ROBOT'},
+        [MODEL.SENTRY]: {energy: 3, sightTop: 0.25, label: 'SENTRY'},
+        [MODEL.TREE]: {energy: 1, sightTop: 0.05, label: 'TREE'},
+        [MODEL.BOULDER]: {energy: 2, sightTop: -0.375, label: 'BOULDER'},
+        [MODEL.MEANIE]: {energy: 1, sightTop: 0.1, label: 'MEANIE'},
+        [MODEL.SENTINEL]: {energy: 4, sightTop: 0.25, label: 'SENTINEL'},
+        [MODEL.PEDESTAL]: {energy: 0, sightTop: 0.125, label: 'PEDESTAL'}
+    });
+    // Cell corners are A=(x,y), B=(x+1,y), C=(x,y+1), D=(x+1,y+1).
+    const TERRAIN_SHAPE = Object.freeze({
+        FLAT: 0, AB_ABOVE_CD: 1, A_BELOW_OTHERS: 2, D_BELOW_OTHERS: 3,
+        EQUAL_DIAGONAL: 4, AC_ABOVE_BD: 5, C_ABOVE_OTHERS: 6, B_BELOW_OTHERS: 7,
+        RESERVED_8: 8, CD_ABOVE_AB: 9, D_ABOVE_OTHERS: 10, A_ABOVE_OTHERS: 11,
+        UNEQUAL_DIAGONALS: 12, BD_ABOVE_AC: 13, B_ABOVE_OTHERS: 14, C_BELOW_OTHERS: 15
+    });
+    const splitAD = {diagonal: 'AD', triangles: [[0,3,1],[0,2,3]], interiorEdges: [2,1], singleQuad: false};
+    const quadAD = {...splitAD, singleQuad: true};
+    const splitBC = {diagonal: 'BC', triangles: [[0,2,1],[1,2,3]], interiorEdges: [0,2], singleQuad: false};
+    const TERRAIN_TOPOLOGY = Object.freeze({
+        [TERRAIN_SHAPE.FLAT]: quadAD,
+        [TERRAIN_SHAPE.AB_ABOVE_CD]: quadAD,
+        [TERRAIN_SHAPE.A_BELOW_OTHERS]: splitAD,
+        [TERRAIN_SHAPE.D_BELOW_OTHERS]: splitAD,
+        [TERRAIN_SHAPE.EQUAL_DIAGONAL]: splitAD,
+        [TERRAIN_SHAPE.AC_ABOVE_BD]: quadAD,
+        [TERRAIN_SHAPE.C_ABOVE_OTHERS]: splitBC,
+        [TERRAIN_SHAPE.B_BELOW_OTHERS]: splitBC,
+        [TERRAIN_SHAPE.RESERVED_8]: splitAD,
+        [TERRAIN_SHAPE.CD_ABOVE_AB]: quadAD,
+        [TERRAIN_SHAPE.D_ABOVE_OTHERS]: splitAD,
+        [TERRAIN_SHAPE.A_ABOVE_OTHERS]: splitAD,
+        [TERRAIN_SHAPE.UNEQUAL_DIAGONALS]: splitAD,
+        [TERRAIN_SHAPE.BD_ABOVE_AC]: quadAD,
+        [TERRAIN_SHAPE.B_ABOVE_OTHERS]: splitBC,
+        [TERRAIN_SHAPE.C_BELOW_OTHERS]: splitBC
+    });
     const byte = n => n & 255;
     const packBCD = n => parseInt(String(n).padStart(4, '0'), 16);
 
@@ -46,14 +82,28 @@ window.Sentinel = window.Sentinel || {};
     }
 
     function classify(a, b, c, d) {
-        if (a === b && b === c && c === d) return 0;
-        if (a === b && b === c) return a < d ? 10 : 3;
-        if (b === c && c === d) return d < a ? 11 : 2;
-        if (a === b && b === d) return d < c ? 6 : 15;
-        if (a === c && c === d) return d < b ? 14 : 7;
-        if (a === b && c === d) return d < b ? 1 : 9;
-        if (a === c && b === d) return d < c ? 5 : 13;
-        return d === b || a === c ? 4 : 12;
+        if (a === b && b === c && c === d) return TERRAIN_SHAPE.FLAT;
+        if (a === b && b === c) return a < d ? TERRAIN_SHAPE.D_ABOVE_OTHERS : TERRAIN_SHAPE.D_BELOW_OTHERS;
+        if (b === c && c === d) return d < a ? TERRAIN_SHAPE.A_ABOVE_OTHERS : TERRAIN_SHAPE.A_BELOW_OTHERS;
+        if (a === b && b === d) return d < c ? TERRAIN_SHAPE.C_ABOVE_OTHERS : TERRAIN_SHAPE.C_BELOW_OTHERS;
+        if (a === c && c === d) return d < b ? TERRAIN_SHAPE.B_ABOVE_OTHERS : TERRAIN_SHAPE.B_BELOW_OTHERS;
+        if (a === b && c === d) return d < b ? TERRAIN_SHAPE.AB_ABOVE_CD : TERRAIN_SHAPE.CD_ABOVE_AB;
+        if (a === c && b === d) return d < c ? TERRAIN_SHAPE.AC_ABOVE_BD : TERRAIN_SHAPE.BD_ABOVE_AC;
+        return d === b || a === c ? TERRAIN_SHAPE.EQUAL_DIAGONAL : TERRAIN_SHAPE.UNEQUAL_DIAGONALS;
+    }
+
+    function averageFourHeights(line) {
+        for (let i = 0; i < 32; ++i) line[i] = (line[i] + line[i + 1] + line[i + 2] + line[i + 3]) >>> 2;
+    }
+
+    function clampHeightExtrema(line) {
+        // Reverse traversal intentionally feeds each changed sample into the
+        // next comparison, preserving the original terrain-generation order.
+        for (let i = 31; i >= 0; --i) {
+            const before = line[i], height = line[i + 1], after = line[i + 2];
+            if (height < before && height < after) line[i + 1] = Math.min(before,after);
+            else if (height > before && height > after) line[i + 1] = Math.max(before,after);
+        }
     }
 
     class Landscape {
@@ -80,31 +130,20 @@ window.Sentinel = window.Sentinel || {};
         shape(x, y) { return this.shapes[y * 31 + x]; }
         inside(x, y) { return x >= 0 && y >= 0 && x < 31 && y < 31; }
         head(x, y) { return this.inside(x, y) ? this.objects[this.heads[y * 31 + x]] || null : null; }
-        flat(x, y) { return this.inside(x, y) && this.shape(x, y) === 0; }
-        filter(mode, fixed, work) {
-            const vertical = !!(mode & 128);
+        flat(x, y) { return this.inside(x, y) && this.shape(x, y) === TERRAIN_SHAPE.FLAT; }
+        filterLine(start, stride, transform, work) {
             for (let i = 34; i >= 0; --i) {
-                const c = i & 31;
-                work[i] = this.height(vertical ? fixed : c, vertical ? c : fixed);
+                work[i] = this.heights[start + (i & 31) * stride];
             }
-            if (mode & 64) {
-                for (let i = 31; i >= 0; --i) {
-                    const a = work[i], b = work[i + 1], c = work[i + 2];
-                    if (b < a && b < c) work[i + 1] = Math.min(a, c);
-                    else if (b > a && b > c) work[i + 1] = Math.max(a, c);
-                }
-            } else {
-                for (let i = 0; i < 32; ++i) work[i] = (work[i] + work[i + 1] + work[i + 2] + work[i + 3]) >>> 2;
-            }
+            transform(work);
             for (let i = 31; i >= 0; --i) {
-                const x = vertical ? fixed : i, y = vertical ? i : fixed;
-                this.heights[y * 32 + x] = work[i];
+                this.heights[start + i * stride] = work[i];
             }
         }
-        smooth(mode, work) {
+        filterRowsAndColumns(transform, work) {
             for (let pass = 0; pass < 2; ++pass) {
-                for (let y = 31; y >= 0; --y) this.filter(mode, y, work);
-                for (let x = 31; x >= 0; --x) this.filter(mode | 128, x, work);
+                for (let row = 31; row >= 0; --row) this.filterLine(row * 32,1,transform,work);
+                for (let column = 31; column >= 0; --column) this.filterLine(column,32,transform,work);
             }
         }
         generate() {
@@ -114,13 +153,13 @@ window.Sentinel = window.Sentinel || {};
             const work = new Uint8Array(35);
             const scale = this.number === 0 ? 24 : this.random.sum() + 14;
             for (let y = 31; y >= 0; --y) for (let x = 31; x >= 0; --x) this.heights[y * 32 + x] = this.random.next();
-            this.smooth(0, work);
+            this.filterRowsAndColumns(averageFourHeights, work);
             for (let y = 31; y >= 0; --y) for (let x = 31; x >= 0; --x) {
                 let height = byte(Math.floor((this.height(x, y) - 128) * scale / 256) + 6);
                 if (height & 128) height = 0;
                 this.heights[y * 32 + x] = Math.min(height + 1, 11);
             }
-            this.smooth(64, work);
+            this.filterRowsAndColumns(clampHeightExtrema, work);
             for (let y = 30; y >= 0; --y) for (let x = 30; x >= 0; --x) {
                 this.shapes[y * 31 + x] = classify(this.height(x, y), this.height(x + 1, y), this.height(x, y + 1), this.height(x + 1, y + 1));
             }
@@ -161,44 +200,46 @@ window.Sentinel = window.Sentinel || {};
         placePrincipals() {
             const difficulty = this.number >= 100 ? 8 : Math.min(8, Math.floor(this.number / 10) + 1);
             this.sentryCount = this.number ? Math.min(this.random.sentries(packBCD(this.number) >>> 8), difficulty) : 1;
-            const regions = new Uint8Array(64), xs = new Uint8Array(64), ys = new Uint8Array(64);
+            const regions = [];
             let threshold = 0;
             for (let region = 0; region < 64; ++region) {
                 const x0 = (region & 7) * 4, y0 = (region >>> 3) * 4;
-                let h = 0;
+                const best = {x: 0, y: 0, height: 0};
                 for (let y = y0; y < Math.min(y0 + 4, 31); ++y) for (let x = x0; x < Math.min(x0 + 4, 31); ++x) {
-                    const height = this.height(x, y) << 4;
-                    if (!this.flat(x, y) || height < h) continue;
-                    h = height; xs[region] = x; ys[region] = y;
+                    const height = this.height(x, y);
+                    if (!this.flat(x, y) || height < best.height) continue;
+                    best.x = x; best.y = y; best.height = height;
                 }
-                regions[region] = h; threshold = Math.max(threshold, h);
+                regions.push(best); threshold = Math.max(threshold, best.height);
             }
             for (let slot = 0; slot < this.sentryCount; ++slot) {
                 let candidates;
                 do {
                     candidates = [];
-                    for (let r = 63; r >= 0; --r) if (regions[r] === threshold) candidates.push(r);
-                    if (!candidates.length) threshold -= 16;
+                    for (let r = 63; r >= 0; --r) if (regions[r].height === threshold) candidates.push(r);
+                    if (!candidates.length) --threshold;
                 } while (!candidates.length && threshold >= 0);
                 if (!candidates.length) throw new Error('No Sentinel placement');
                 const mask = (1 << Math.ceil(Math.log2(candidates.length + 1))) - 1;
                 let choice;
                 do { choice = this.random.next() & mask; } while (choice >= candidates.length);
-                const region = candidates[choice];
-                for (const d of [-9, -8, -7, -1, 0, 1, 7, 8, 9]) if (region + d >= 0 && region + d < 64) regions[region + d] = 0;
+                const region = candidates[choice], site = regions[region];
+                // Preserve the original linear neighbor offsets, including
+                // their overlap across the left/right edges of a region row.
+                for (const d of [-9, -8, -7, -1, 0, 1, 7, 8, 9]) if (region + d >= 0 && region + d < 64) regions[region + d].height = 0;
                 if (!slot) {
-                    this.sentinelSquare = {x: xs[region], y: ys[region]};
+                    this.sentinelSquare = {x: site.x, y: site.y};
                     const pedestal = this.allocate(MODEL.PEDESTAL);
-                    this.attach(pedestal, xs[region], ys[region]); pedestal.heading = 0;
+                    this.attach(pedestal, site.x, site.y); pedestal.heading = 0;
                 }
                 const sentry = this.allocate(slot ? MODEL.SENTRY : MODEL.SENTINEL, slot);
-                this.attach(sentry, xs[region], ys[region]);
+                this.attach(sentry, site.x, site.y);
                 const random = this.random.next();
                 sentry.scanDelay = ((random >>> 1) & 63) | 5;
                 sentry.turnStep = random & 1 ? -20 : 20;
                 sentry.turnDelay = 0;
             }
-            this.heightLimit = threshold >>> 4;
+            this.heightLimit = threshold;
         }
         populate() {
             const robot = this.allocate(MODEL.ROBOT);
@@ -218,7 +259,7 @@ window.Sentinel = window.Sentinel || {};
             if (!this.inside(ix, iy)) return -Infinity;
             const u = x - ix, v = y - iy;
             const a = this.height(ix, iy), b = this.height(ix + 1, iy), c = this.height(ix, iy + 1), d = this.height(ix + 1, iy + 1);
-            if ([6, 7, 14, 15].includes(this.shape(ix, iy))) return u + v < 1 ? a + (b - a) * u + (c - a) * v : d + (c - d) * (1 - u) + (b - d) * (1 - v);
+            if (TERRAIN_TOPOLOGY[this.shape(ix, iy)].diagonal === 'BC') return u + v < 1 ? a + (b - a) * u + (c - a) * v : d + (c - d) * (1 - u) + (b - d) * (1 - v);
             return u > v ? a + (b - a) * u + (d - b) * v : a + (d - c) * u + (c - a) * v;
         }
     }
@@ -227,5 +268,5 @@ window.Sentinel = window.Sentinel || {};
         if (!cache.has(number)) cache.set(number, new Landscape(number).code);
         return cache.get(number);
     }
-    S.World = {MODEL, ENERGY, Random, Landscape, classify, secret, packBCD};
+    S.World = {MODEL, MODEL_INFO, TERRAIN_SHAPE, TERRAIN_TOPOLOGY, Random, Landscape, classify, secret, packBCD};
 }(window.Sentinel));

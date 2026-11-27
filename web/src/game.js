@@ -1,11 +1,10 @@
 /* Game state and actions have no dependency on DOM, audio or Three.js. */
 (function (S) {
     'use strict';
-    const {MODEL: M, ENERGY, Landscape} = S.World;
+    const {MODEL: M, MODEL_INFO, Landscape} = S.World;
     const TAU = Math.PI * 2;
     const VISIBILITY = Object.freeze({NONE: 0, PARTIAL: 64, FULL: 128});
     const angleDifference = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
-    const modelTop = [0.12, 0.25, 0.05, -0.375, 0.1, 0.25, 0.125];
     const TICK_HZ = 1193182 / 21845;
 
     class Game {
@@ -44,7 +43,7 @@
                     /* Objects are centered in their square; do not fill the whole
                      * square with an invisible wall around a slender tree. */
                     if (Math.abs(x - object.x - 0.5) > 0.28 || Math.abs(y - object.y - 0.5) > 0.28) continue;
-                    if (object.z + modelTop[object.model] > z && object.z - 0.875 < z) return false;
+                    if (object.z + MODEL_INFO[object.model].sightTop > z && object.z - 0.875 < z) return false;
                 }
             }
             return true;
@@ -112,7 +111,7 @@
                     return this.fail(onPedestal ? 'PRESS H TO HYPERSPACE TO THE NEXT LANDSCAPE'
                         : 'THE SENTINEL IS GONE - REACH ITS PEDESTAL');
                 }
-                const energy = ENERGY[head.model];
+                const energy = MODEL_INFO[head.model].energy;
                 if (!world.detach(head)) return this.fail('REMOVE THE TOP OBJECT FIRST');
                 for (const owner of world.objects) if (owner && owner.meanie === head.id) owner.meanie = -1;
                 this.changeEnergy(energy); this.changed('absorb', head);
@@ -122,12 +121,12 @@
             const model = {tree: M.TREE, boulder: M.BOULDER, robot: M.ROBOT}[action];
             if (model === undefined) return this.fail('UNKNOWN ACTION');
             if (head && ![M.BOULDER, M.PEDESTAL].includes(head.model)) return this.fail('THAT SQUARE IS OCCUPIED');
-            if (this.energy < ENERGY[model]) return this.fail('NOT ENOUGH ENERGY');
+            if (this.energy < MODEL_INFO[model].energy) return this.fail('NOT ENOUGH ENERGY');
             const object = world.allocate(model);
             if (!object) return this.fail('NO FREE OBJECT SLOTS');
             if (!world.attach(object, contact.x, contact.y)) { world.objects[object.id] = null; return this.fail('CANNOT CREATE HERE'); }
             if (model === M.ROBOT) object.heading = this.player.heading ^ 128;
-            this.changeEnergy(-ENERGY[model]); this.changed('create', object);
+            this.changeEnergy(-MODEL_INFO[model].energy); this.changed('create', object);
             return true;
         }
         hyperspace(cause = null) {

@@ -75,6 +75,13 @@
         return {data, width: image.width, height: image.height};
     }
 
+    function appendModelFace(positions, model, face) {
+        for (let i = 1; i + 1 < face.length; ++i) for (const vertex of [face[0],face[i],face[i + 1]]) {
+            const [x,y,z] = model.vertices[vertex];
+            positions.push(x,z,-y);
+        }
+    }
+
     class Overlay {
         constructor(assets) {
             this.scene = new T.Scene(); this.camera = new T.OrthographicCamera(0, 640, 0, 400, -10, 10);
@@ -303,8 +310,8 @@
             }
             return this.starfield;
         }
-        material(a, b, terrain = false, midpoint = false) {
-            const key = `${a}:${b}:${terrain}:${midpoint}`;
+        material(a, b, terrain = false) {
+            const key = `${a}:${b}:${terrain}`;
             if (!this.materials.has(key)) {
                 const palette = this.palette();
                 this.materials.set(key, new T.ShaderMaterial({
@@ -315,15 +322,14 @@
                         vec4 p=modelViewMatrix*vec4(position,1.0); range=length(p.xyz); gl_Position=projectionMatrix*p; }`,
                     fragmentShader: `${terrain ? 'varying vec3 boundary;' : ''}
                         uniform vec3 first; uniform vec3 second; uniform float distanceShading; varying float range;
-                        void main(){float d=${midpoint ? '0.5' : 'mod(floor(gl_FragCoord.x)+floor(gl_FragCoord.y),2.0)'};
-                        ${terrain ? 'vec3 pixels=boundary/max(fwidth(boundary),vec3(0.000001)); d=1.0-clamp(0.425+0.5-min(pixels.x,min(pixels.y,pixels.z)),0.0,1.0);' : ''}
-                        vec3 c=mix(first,second,d); c*=1.0-smoothstep(14.0,65.0,range)*0.65*distanceShading;
+                        void main(){
+                        ${terrain ? 'vec3 pixels=boundary/max(fwidth(boundary),vec3(0.000001)); float blend=1.0-clamp(0.425+0.5-min(pixels.x,min(pixels.y,pixels.z)),0.0,1.0);' : 'float blend=0.5;'}
+                        vec3 c=mix(first,second,blend); c*=1.0-smoothstep(14.0,65.0,range)*0.65*distanceShading;
                         gl_FragColor=vec4(c,1.0);
                         #include <colorspace_fragment>
                         }`, side: T.DoubleSide, toneMapped: false
                 }));
                 this.materials.get(key).userData.palettePair = [a & 15,b & 15];
-                this.materials.get(key).userData.midpoint = midpoint;
             }
             return this.materials.get(key);
         }
@@ -334,10 +340,7 @@
                 const pair = model.materials[faceIndex].palette_pair;
                 const key = pair[0] * 16 + pair[1];
                 if (!buckets.has(key)) buckets.set(key, []);
-                const bucket = buckets.get(key);
-                for (let i = 1; i + 1 < face.length; ++i) for (const v of [face[0], face[i], face[i + 1]]) {
-                    const [x, y, z] = model.vertices[v]; bucket.push(x, z, -y);
-                }
+                appendModelFace(buckets.get(key),model,face);
             });
             const geometry = new T.BufferGeometry();
             geometry.userData.palettePairs = [];
@@ -351,7 +354,7 @@
         }
         modelMesh(id) {
             const geometry = this.modelGeometry(id);
-            const materials = geometry.userData.palettePairs.map(pair => this.material(pair[0], pair[1], false, true));
+            const materials = geometry.userData.palettePairs.map(pair => this.material(pair[0], pair[1]));
             return new T.Mesh(geometry, materials);
         }
         buildTitleFigure() {
@@ -386,9 +389,7 @@
                         if (index === 7) color = 8;
                     }
                     const start = positions.length / 3;
-                    for (let i = 1; i + 1 < face.length; ++i) for (const vertex of [face[0],face[i],face[i + 1]]) {
-                        const [x,y,z] = model.vertices[vertex]; positions.push(x,z,-y);
-                    }
+                    appendModelFace(positions,model,face);
                     geometry.addGroup(start,positions.length / 3 - start,materials.length);
                     materials.push(paint(color));
                 });
@@ -450,25 +451,23 @@
             for (let y = 0; y < 31; ++y) for (let x = 0; x < 31; ++x) {
                 const points = [[x,world.height(x,y),-y], [x+1,world.height(x+1,y),-y],
                     [x,world.height(x,y+1),-y-1], [x+1,world.height(x+1,y+1),-y-1]];
-                const shape = world.shape(x, y), diagonal = [6,7,14,15].includes(shape);
-                const triangles = diagonal ? [[0,2,1],[1,2,3]] : [[0,3,1],[0,2,3]];
+                const shape = world.shape(x, y), topology = S.World.TERRAIN_TOPOLOGY[shape];
+                const triangles = topology.triangles;
                 for (let t = 0; t < 2; ++t) {
-                    // Shapes 1/5/9/13 are single sloping quads in the original:
-                    // our two WebGL triangles must share their polygon color.
+                    // Single quads share one polygon color across both WebGL triangles.
                     // Only split cells use the second color bank at +16.
-                    const bank = (shape & 3) === 1 ? 0 : t * 16;
-                    let pair = pairs[shape ? shape + bank : ((x ^ y) & 1 ? 8 : 0)];
+                    const bank = topology.singleQuad ? 0 : t * 16;
+                    let pair = pairs[shape !== S.World.TERRAIN_SHAPE.FLAT ? shape + bank : ((x ^ y) & 1 ? 8 : 0)];
                     // Shape 12's second bank contains the flat-floor selector;
                     // both of this irregular cell's triangles are sloping.
-                    if (shape === 12) pair = pairs[12];
+                    if (shape === S.World.TERRAIN_SHAPE.UNEQUAL_DIAGONALS) pair = pairs[shape];
                     if (!buckets.has(pair)) buckets.set(pair, {positions: [], contours: [], cells: []});
                     const bucket = buckets.get(pair);
-                    const quad = shape === 0 || (shape & 3) === 1;
-                    const hiddenEdge = diagonal ? (t === 0 ? 0 : 2) : (t === 0 ? 2 : 1);
+                    const hiddenEdge = topology.interiorEdges[t];
                     for (let vertex = 0; vertex < 3; ++vertex) {
                         bucket.positions.push(...points[triangles[t][vertex]]);
                         for (let edge = 0; edge < 3; ++edge)
-                            bucket.contours.push((quad && edge === hiddenEdge) || edge === vertex ? 1 : 0);
+                            bucket.contours.push((topology.singleQuad && edge === hiddenEdge) || edge === vertex ? 1 : 0);
                     }
                     bucket.cells.push({x, y});
                 }
@@ -617,8 +616,7 @@
                     const color = valid ? 0x55ffff : 0xffffff;
                     h.crosshair(320,200,color);
                     if (target) {
-                        const names = ['ROBOT','SENTRY','TREE','BOULDER','MEANIE','SENTINEL','PEDESTAL'];
-                        const name = object ? names[object.model] : this.game.landscape.flat(target.x,target.y) ? 'EMPTY SQUARE' : 'SLOPE';
+                        const name = object ? S.World.MODEL_INFO[object.model].label : this.game.landscape.flat(target.x,target.y) ? 'EMPTY SQUARE' : 'SLOPE';
                         h.text(name,320,345,valid?0x55ffff:0xaaaaaa,10,'center');
                     }
                 }

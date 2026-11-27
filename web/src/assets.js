@@ -113,10 +113,13 @@ window.Sentinel = window.Sentinel || {};
         });
     }
 
-    async function loadAssets(files = S.assetFiles) {
+    async function loadAssets(files = S.assetFiles, forEditing = false) {
         const json = name => JSON.parse(new TextDecoder().decode(bytes(files[name])));
         const manifest = json('models/models.json');
-        const models = manifest.models.map(name => {
+        // IDs 0..6 are playable objects; 7..9 are original block-letter meshes.
+        // Editors still validate the complete manifest, including unused artwork.
+        const modelFiles = forEditing ? manifest.models : manifest.models.slice(0,7);
+        const models = modelFiles.map(name => {
             const metadata = json('models/' + name);
             const mesh = parsePLY(bytes(files['models/' + metadata.mesh]));
             if (!metadata.faces || metadata.faces.length !== mesh.faces.length) throw new Error(name + ': face metadata count differs from PLY');
@@ -126,17 +129,11 @@ window.Sentinel = window.Sentinel || {};
         const [font, icons, mountains] = await Promise.all([readPNG(files['images/font.png']),
             readPNG(files['images/color.png']), readSVG(files['images/title-mountains.svg'])]);
         if (font.width !== 128 || font.height !== 32 || icons.width !== 80 || icons.height !== 8) throw new Error('Font must be 128×32 and icons 80×8');
-        const fontRows = Array.from({length: 64}, (_, c) => Array.from({length: 8}, (_, y) => {
-            let bits = 0;
-            for (let x = 0; x < 8; ++x) {
-                const at = (((c >>> 4) * 8 + y) * font.width + (c & 15) * 8 + x) * 4;
-                if (font.data[at] > 127 && font.data[at + 3]) bits |= 128 >>> x;
-            }
-            return bits;
-        }));
         const resources = {};
-        for (const name of ['Sentry', 'Skybox', 'Tfinal']) resources[name] = decodeResource(bytes(files['original/' + name + '.bin']));
-        return {models, font, fontRows, icons, mountains, resources, palette: EGA};
+        const resourceNames = forEditing ? ['Sentry','Skybox','Tfinal'] : ['Skybox','Tfinal'];
+        for (const name of resourceNames) resources[name] = decodeResource(bytes(files['original/' + name + '.bin']));
+        return {models, font, icons, mountains, resources, palette: EGA};
     }
-    S.Assets = {bytes, parsePLY, decodeResource, readPNG, load: loadAssets, palette: EGA};
+    S.Assets = {bytes, parsePLY, decodeResource, readPNG,
+        load: files => loadAssets(files), validate: files => loadAssets(files,true), palette: EGA};
 }(window.Sentinel));

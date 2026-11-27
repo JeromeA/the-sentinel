@@ -22,19 +22,34 @@
     ];
     // Keep the original 16-byte records as the reference, but decode them once
     // so playback operates on sound concepts rather than record offsets.
-    const EFFECT_DEFINITIONS = EFFECTS.map(([
+    function decodeEffect([
         control, level, pitch, envelopePeriod, envelopeStep, envelopeSteps,
         nextEnvelopeStep, nextEnvelopeSteps, firstPitchStep, firstPitchSteps,
         pitchPeriod, nextEnvelopePeriod, secondPitchStep, secondPitchSteps,
         thirdPitchStep, thirdPitchSteps
-    ]) => ({
-        control: {voice: control & 3, noise: Boolean(control & 4), octaveReduction: (control >>> 3) & 7},
-        level, pitch, pitchPeriod,
-        envelope: {period: envelopePeriod, step: envelopeStep, steps: envelopeSteps,
-            nextStep: nextEnvelopeStep, nextSteps: nextEnvelopeSteps, nextPeriod: nextEnvelopePeriod},
-        pitchPhases: [{step: firstPitchStep, steps: firstPitchSteps},
-            {step: secondPitchStep, steps: secondPitchSteps}, {step: thirdPitchStep, steps: thirdPitchSteps}]
-    }));
+    ], channel, durationTicks) {
+        return {
+            channel, durationTicks,
+            control: {voice: control & 3, noise: Boolean(control & 4), octaveReduction: (control >>> 3) & 7},
+            level, pitch, pitchPeriod,
+            envelope: {period: envelopePeriod, step: envelopeStep, steps: envelopeSteps,
+                nextStep: nextEnvelopeStep, nextSteps: nextEnvelopeSteps, nextPeriod: nextEnvelopePeriod},
+            pitchPhases: [{step: firstPitchStep, steps: firstPitchSteps},
+                {step: secondPitchStep, steps: secondPitchSteps}, {step: thirdPitchStep, steps: thirdPitchSteps}]
+        };
+    }
+    // Routing and the redraw-noise lifetime belong to each cue, rather than
+    // being inferred from its position in the original effect table.
+    const EFFECT = Object.freeze({
+        SENTRY_ROTATION: decodeEffect(EFFECTS[0],3),
+        MEANIE_ROTATION: decodeEffect(EFFECTS[1],3),
+        ACTION_SUCCESS: decodeEffect(EFFECTS[2],3,16),
+        MELODY_NOTE: decodeEffect(EFFECTS[3],0),
+        WARNING_PULSE: decodeEffect(EFFECTS[4],1),
+        ENERGY_FEEDBACK: decodeEffect(EFFECTS[5],2),
+        TRANSITION_NOISE: decodeEffect(EFFECTS[6],3)
+    });
+    const MELODY_START = Object.freeze({INTRO: 0, TRANSFER: 25, LOSS: 50, VICTORY: 66});
     function divisor(pitch, reduction = 0) {
         const octave = Math.floor(pitch / 48) - reduction;
         let value = DIVISORS[pitch % 48];
@@ -48,9 +63,11 @@
             this.context = null; this.nodes = []; this.voices = [null, null, null, null];
             this.cursor = -1; this.countdown = 0; this.duration = 0; this.muted = false;
             this.warning = false; this.warningCountdown = 0;
+            this.paused = false;
             this.random = new S.World.Random(0x1234, 1, 0x5678);
         }
         enable() {
+            this.paused = false;
             if (!this.context) {
                 const Audio = window.AudioContext || window.webkitAudioContext;
                 if (!Audio) return Promise.resolve();
@@ -62,9 +79,15 @@
                     this.nodes.push({oscillator, gain});
                 }
             }
-            return this.context.resume().catch(() => {});
+            return this.context.resume().then(() => {
+                if (this.paused) return this.context.suspend();
+                this.updateOutput();
+            }).catch(() => {});
         }
-        pause() { if (this.context) this.context.suspend().catch(() => {}); }
+        pause() {
+            this.paused = true; this.updateOutput();
+            if (this.context) this.context.suspend().catch(() => {});
+        }
         silence() {
             this.voices.fill(null); this.cursor = -1; this.warning = false; this.warningCountdown = 0; this.updateOutput();
         }
@@ -73,28 +96,24 @@
             this.warning = active; this.voices[1] = null;
         }
         melody(start) { this.cursor = start; this.countdown = 0; this.duration = 0; }
-        effect(index, pitch) {
-            const definition = EFFECT_DEFINITIONS[index];
+        effect(definition, pitch) {
             if (this.muted || !definition) return;
-            const effect = {...definition, envelope: {...definition.envelope}};
+            const {channel, durationTicks, ...template} = definition;
+            const effect = {...template, envelope: {...template.envelope}};
             if (pitch !== undefined) effect.pitch = pitch;
-            // Keep melody notes on their original channel, with an extra
-            // effects channel so immediate player actions cannot replace them.
-            const originalSlot = effect.control.voice;
-            const slot = originalSlot === 0 && index !== 3 ? 3 : originalSlot;
-            this.voices[slot] = {effect, envelopeCountdown: effect.envelope.period, pitchCountdown: effect.pitchPeriod,
+            this.voices[channel] = {effect, envelopeCountdown: effect.envelope.period, pitchCountdown: effect.pitchPeriod,
                 pitchStep: effect.pitchPhases[0].step, pitchSteps: effect.pitchPhases[0].steps, phase: 0, frequency: 100,
-                ticksLeft: index === 2 ? 16 : undefined};
+                ticksLeft: durationTicks};
         }
         tick(random = this.random) {
             // Autoplay approval/resume is asynchronous. Do not consume notes
             // while the context cannot play them (including after a pause).
-            if (this.context && this.context.state !== 'running') return;
+            if (this.paused || (this.context && this.context.state !== 'running')) return;
             // Original dispatcher 008Bh: warning mode 4 triggers effect 4 at
             // 36h-tick intervals. Energy-drain feedback is separate (effect 5).
             if (this.warningCountdown) --this.warningCountdown;
             if (this.warning && this.cursor < 0 && !this.warningCountdown) {
-                this.effect(4); this.warningCountdown = 0x36;
+                this.effect(EFFECT.WARNING_PULSE); this.warningCountdown = 0x36;
             }
             if (this.countdown) --this.countdown;
             if (this.cursor >= 0 && !this.countdown) {
@@ -103,7 +122,7 @@
                     const note = MELODY[this.cursor++];
                     if (note === undefined || note === 255) { this.cursor = -1; break; }
                     if (note >= 200) { this.duration = (note - 200) * 4; continue; }
-                    this.effect(3, note); this.countdown = this.duration; break;
+                    this.effect(EFFECT.MELODY_NOTE, note); this.countdown = this.duration; break;
                 }
             }
             for (let slot = this.voices.length - 1; slot >= 0; --slot) {
@@ -153,6 +172,11 @@
             if (!this.context) return;
             const now = this.context.currentTime;
             this.nodes.forEach((node, slot) => {
+                if (this.paused) {
+                    node.gain.gain.cancelScheduledValues(now);
+                    node.gain.gain.setValueAtTime(0,now);
+                    return;
+                }
                 const v = this.voices[slot], gain = !this.muted && v && v.frequency ? v.effect.level / 15 * 0.025 : 0;
                 node.gain.gain.setTargetAtTime(gain, now, 0.003);
                 if (v && v.frequency) node.oscillator.frequency.setTargetAtTime(v.frequency, now, 0.001);
@@ -160,5 +184,7 @@
         }
     }
     S.Sound = Sound;
+    S.SoundEffect = EFFECT;
+    S.SoundMelody = MELODY_START;
     S.SoundData = {DIVISORS, MELODY, EFFECTS, divisor};
 }(window.Sentinel));
